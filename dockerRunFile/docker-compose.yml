@@ -1,0 +1,45 @@
+version: "3.5"
+
+services:
+  
+
+   mysql:
+          image: mysql:8.0.25
+          container_name: mysql_c
+          restart: on-failure
+          environment: 
+          - MYSQL_ROOT_PASSWORD=admin123
+          volumes:
+          - "/data/dvolumes/db_backup/mysql:/data"
+          ports:
+          - '0.0.0.0:3309:3306'
+
+   phpmyadmin:
+          container_name: phpmyadmin_c
+          image: phpmyadmin/phpmyadmin:5.1.1
+          restart: on-failure
+          links:
+            -  mysql:db
+          depends_on: 
+          - mysql
+          environment:
+          - MYSQL_HOST=localhost
+          - MYSQL_USER=root
+          - MYSQL_PASSWORD=admin123
+          - MYSQL_ROOT_PASSWORD=admin123
+          - UPLOAD_LIMIT=8192M
+          volumes:
+            - "/data/dvolumes/db_backup/phpmyadmin:/data"
+          ports:
+          - '0.0.0.0:8089:80'
+
+   sleep_task:
+      ports:
+         - '0.0.0.0:5166:5166'
+      container_name: sleep_task
+      build: ../backend
+      restart: on-failure
+      volumes:
+         - "/data/dvolumes/sleepTask:/var/sleepTask"
+
+
